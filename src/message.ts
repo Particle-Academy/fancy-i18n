@@ -60,14 +60,20 @@ export function makeReplacements(line: string, values?: Values): string {
   return values ? replaceParts(line, values) : line;
 }
 
-const NUMERIC = /^\s*[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?\s*$/;
-/** PHP 8's loose comparison of a number with a string: numeric, else as strings. */
+/**
+ * PHP 8's loose comparison of a number with a string: numeric, else as strings.
+ * `s` is always part of a condition, so it only holds -?0-9|*,. and no regex
+ * is needed: in that alphabet, PHP's is_numeric and a finite Number() agree.
+ */
 function cmp(n: number, s: string): number {
-  if (NUMERIC.test(s)) return n - Number(s);
+  if (s !== "" && Number.isFinite(Number(s))) return n - Number(s);
   const a = String(n);
   return a < s ? -1 : a > s ? 1 : 0;
 }
 
+// Linear on untrusted text: anchored at ^, and the class cannot contain the
+// closing } or ], so there is exactly one way to match and nothing to retry.
+// The same holds for the strip in chooseWith. tests/hostile-input.test.tsx.
 const CONDITION = /^[{[]([-?\d|*,.]*)[}\]]([\s\S]*)/;
 
 /** MessageSelector::extractFromString. */
@@ -84,8 +90,21 @@ function extract(part: string, n: number): string | undefined {
   return cmp(n, cond) === 0 ? m[2] : undefined;
 }
 
-/** PHP's trim(): space, tab, newline, carriage return, NUL, vertical tab. Nothing else. */
-const phpTrim = (s: string) => s.replace(/^[ \t\n\r\0\x0B]+|[ \t\n\r\0\x0B]+$/g, "");
+/** The characters PHP's trim() strips: space, tab, newline, carriage return, NUL, vertical tab. */
+const trimmable = (c: number) => c == 32 || c == 9 || c == 10 || c == 13 || c == 0 || c == 11;
+
+/**
+ * PHP's trim(), as a linear scan from each end. Not a regex: the text is
+ * translated, so untrusted, and `[ws]+$` rescans every whitespace run to its
+ * end from each position (quadratic; 8 s on 100,000 characters).
+ */
+function phpTrim(s: string): string {
+  let a = 0;
+  let b = s.length;
+  while (a < b && trimmable(s.charCodeAt(a))) a++;
+  while (b > a && trimmable(s.charCodeAt(b - 1))) b--;
+  return s.slice(a, b);
+}
 
 /**
  * MessageSelector::choose with a resolved rule. `onWrongForms` is called when

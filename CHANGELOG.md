@@ -61,6 +61,23 @@ tagged yet. No kit component reads it yet; react-fancy adopts it in phase 2.
   1.25x.
 - With a stable provider, 0 consumer re-renders across 20 parent renders. A
   locale change re-renders each consumer exactly once.
-- Size (gzip, minified, production): 2,934 B for what a labelled component
-  pays, 777 B more for formatting, and 3,748 B for the whole entry. **This is
+- Size (gzip, minified, production): 3,160 B for what a labelled component
+  pays, 777 B more for formatting, and 3,971 B for the whole entry. **This is
   over the plan's 1,536 B figure. The owner decides.**
+
+### Security
+
+- **Everything that parses translated text runs in linear time.** Lang files,
+  packs and community corrections are untrusted input. Before this was tagged,
+  code scanning flagged PHP's trim, which was written as `/^[ws]+|[ws]+$/`
+  (`js/polynomial-redos`, alert 1). It took 8 s on a 100,000-character
+  whitespace run inside a plural condition. It is now a scan from each end,
+  and the same input takes 3 ms. A review of every other regex found two more
+  problems in `t.nodes`' tag matching:
+  - A lazy, unanchored `<b>(.*?)</b>` took 0.9 s on unclosed tags.
+  - The parser recursed once per matched tag, so 12,500 tag pairs overflowed
+    the stack.
+
+  Both are now one forward scan. `tests/hostile-input.test.tsx` holds a timed
+  case for each, and every case failed on the old code. No released version
+  was affected.

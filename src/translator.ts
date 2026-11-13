@@ -96,18 +96,49 @@ export function createTranslator<M extends Messages>(defaults: M, catalog: Fancy
       (values ? replaceParts(line, values, true) : [line]).map((p) =>
         typeof p == "number" || typeof p == "bigint" ? createElement("bdi", { dir: "ltr" }, String(p)) : (p as ReactNode),
       );
-    const names = tags && Object.keys(tags).map((n) => n.replace(/[^\w-]/g, "")).join("|");
+    const names = tags ? Object.keys(tags).filter((n) => /^[\w-]+$/.test(n)) : [];
+    /**
+     * Laravel's `<name>(.*?)</name>` (no s flag), as a scan rather than a
+     * regex: the text is translated, so untrusted, and a lazy unanchored
+     * pattern rescans to the end from every unclosed tag (quadratic). Every
+     * indexOf below only ever moves forward, so the whole pass is linear, and a
+     * run of matched tags is a loop, not one recursion per tag. Recursion only
+     * enters a match's content, which holds no closing tag of its own name.
+     */
     const render = (line: string): ReactNode[] => {
-      const m = names ? new RegExp(`<(${names})>(.*?)</\\1>`).exec(line) : null;
-      if (!m) return parts(line);
-      return [
-        ...parts(line.slice(0, m.index)),
-        tags![m[1]!]!(createElement(Fragment, null, ...render(m[2]!))),
-        ...render(line.slice(m.index + m[0].length)),
-      ];
+      const out: ReactNode[] = [];
+      const open: Record<string, number> = {};
+      const close: Record<string, number> = {};
+      let nl = -2;
+      let at = 0;
+      let from = 0;
+      for (;;) {
+        let p = -1;
+        let name = "";
+        for (const n of names) {
+          if (open[n] === undefined || (open[n]! >= 0 && open[n]! < from)) open[n] = line.indexOf("<" + n + ">", from);
+          const i = open[n]!;
+          if (i >= 0 && (p < 0 || i < p)) (p = i), (name = n);
+        }
+        if (p < 0) break;
+        const s = p + name.length + 2;
+        let c = close[name];
+        if (c === undefined || (c >= 0 && c < s)) close[name] = c = line.indexOf("</" + name + ">", s);
+        if (nl != -1 && nl < s) nl = line.indexOf("\n", s);
+        // No closing tag after this one: no later opening tag of the name can match either.
+        if (c < 0) open[name] = -1;
+        // A newline before the nearest close: every opening tag before that newline fails too.
+        else if (nl >= 0 && nl < c) open[name] = line.indexOf("<" + name + ">", nl + 1);
+        else {
+          out.push(...parts(line.slice(at, p)), tags![name]!(createElement(Fragment, null, render(line.slice(s, c)))));
+          at = from = c + name.length + 3;
+        }
+      }
+      out.push(...parts(line.slice(at)));
+      return out.map((x, i) => (x !== null && typeof x == "object" ? createElement(Fragment, { key: i }, x) : x));
     };
     const out = render(text);
-    return out.length == 1 && typeof out[0] == "string" ? out[0] : createElement(Fragment, null, ...out);
+    return out.length == 1 && typeof out[0] == "string" ? out[0] : createElement(Fragment, null, out);
   };
 
   t.resolve = (key) => {

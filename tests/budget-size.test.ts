@@ -27,7 +27,9 @@ import { build } from "tsup";
  * what 0.1 measured.
  */
 const OWNER_BUDGET = 1536;
-const CEILING = { component: 3072, format: 896, entry: 3968 };
+// Raised once, on 2026-11-13, by the linear tag scanner that replaced a
+// quadratic regex (code-scanning alert 1): about 226 B for a security fix.
+const CEILING = { component: 3328, format: 896, entry: 4096 };
 
 async function gzipOf(exports: string): Promise<{ raw: number; gz: number; code: string }> {
   const dir = mkdtempSync(join(tmpdir(), "fancy-i18n-size-"));
@@ -75,7 +77,7 @@ describe("size budget", () => {
   });
 
   // NOT MET in 0.1, awaiting the owner. Un-skip when the budget or the scope changes.
-  it.skip(`OWNER BUDGET I12: the core is at most ${OWNER_BUDGET} B gzip (0.1 measures about 2,930 B for a component, 3,750 B whole)`, async () => {
+  it.skip(`OWNER BUDGET I12: the core is at most ${OWNER_BUDGET} B gzip (0.1 measures about 3,160 B for a component, 3,970 B whole)`, async () => {
     expect((await gzipOf("FancyI18nProvider, useFancyT, defineMessages")).gz).toBeLessThanOrEqual(OWNER_BUDGET);
   });
 });

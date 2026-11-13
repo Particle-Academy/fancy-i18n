@@ -49,6 +49,13 @@ envelope's `RULES.md` and are not repeated here. The design is the envelope's
   a production bundle drops them, message and all. Don't move that guard into
   a helper: esbuild doesn't inline a function, and the size test checks that
   `[fancy-i18n]` is gone from the build.
+- **Translated text is untrusted, and everything that parses it is linear.**
+  That covers PHP's trim and the tag scan in `t.nodes`. Neither is a regex,
+  because the regexes they replaced were quadratic (code-scanning alert 1).
+  The only regexes left on that text are anchored, with one way to match.
+  A new regex on message text needs a timed case in
+  `tests/hostile-input.test.tsx`, and the case must fail on a backtracking
+  version.
 - **No DOM, no fetch, no `dir`.** The only `dir` is the `ltr` isolate around
   numbers in `t.nodes`.
 - **Zero runtime dependencies.**
