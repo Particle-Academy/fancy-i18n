@@ -62,8 +62,12 @@ tagged yet. No kit component reads it yet; react-fancy adopts it in phase 2.
 - With a stable provider, 0 consumer re-renders across 20 parent renders. A
   locale change re-renders each consumer exactly once.
 - Size (gzip, minified, production): 3,160 B for what a labelled component
-  pays, 777 B more for formatting, and 3,971 B for the whole entry. **This is
-  over the plan's 1,536 B figure. The owner decides.**
+  pays, 777 B more for formatting, and 3,971 B for the whole entry.
+- **Core size budget: 3,300 B gzip**, enforced by a gating test. The owner
+  accepted about 3.2 KB on 2026-11-13 (decision `q_5562c08b`), replacing the
+  plan's original I12 figure of 1,536 B. That figure was an estimate, and the
+  phase-1 scope could not meet it. The test also gates formatting at 896 B and
+  the whole entry at 4,096 B.
 
 ### Security
 

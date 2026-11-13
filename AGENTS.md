@@ -65,6 +65,7 @@ envelope's `RULES.md` and are not repeated here. The design is the envelope's
 `npm test`. The budget tests print their numbers to stderr:
 `budget-deterministic` (compile, construct and cache counts),
 `provider.test.tsx` (re-render counts), `budget-timed` (the SSR ratio, paired
-per round), and `budget-size` (three bundles, with ceilings). The owner's
-1,536 B core figure is a skipped test that names it, because 0.1 does not meet
-it. Read results from a redirected log and its exit code, never through a pipe.
+per round), and `budget-size` (three bundles). The core budget is 3,300 B gzip for a
+component (owner, 2026-11-13, `q_5562c08b`). Only the owner moves it; a test
+edit never does. Read results from a redirected log and its exit code, never
+through a pipe.

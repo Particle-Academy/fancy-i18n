@@ -125,7 +125,7 @@ The CI tests measure these numbers. They are not estimates.
 | 2,000 components x 3 strings, SSR, no provider | 1.02 to 1.04x a literal | 1.10x |
 | The same with an es provider | 1.05 to 1.06x | 1.25x |
 | Consumer re-renders, 20 parent renders, stable provider | 0 | 0 |
-| A component's size (gzip, minified, production) | 3,160 B | see CHANGELOG |
+| A component's size (gzip, minified, production) | 3,160 B | 3,300 B |
 | 100,000 characters of hostile translated text | linear: 1 to 30 ms | 250 ms |
 
 ## License
