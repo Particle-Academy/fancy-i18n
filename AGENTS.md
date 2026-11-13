@@ -1,0 +1,63 @@
+# AGENTS.md: fancy-i18n
+
+The runtime label layer for the Fancy UI kit. `CLAUDE.md` is a symlink to this
+file. Process rules (publishing, versions, third-party code) live in the
+envelope's `RULES.md` and are not repeated here. The design is the envelope's
+`.ai/plans/kit-i18n.md`.
+
+## Where things are
+
+- `src/message.ts`: `makeReplacements` (Laravel's strtr pass), `choose` /
+  `chooseWith` (MessageSelector with conditions). Compiled splits are cached in
+  `internal.ts`'s `templates`.
+- `src/plural.ts`: Laravel's `getPluralIndex` as data, by language, with
+  normalisation and host overrides.
+- `src/locales.ts`: `canon`, `language`, the five built-in locales, the
+  Simplified Chinese aliases, `packServes`.
+- `src/catalog.ts`: `createFancyCatalog`, the context value. Its shape is a
+  protocol between installed copies, so it only grows (`protocol: 1`).
+- `src/translator.ts`: `createTranslator`, which builds `t`, `choice`, `nodes`
+  and `resolve`.
+- `src/react.tsx`: `FancyI18nProvider` (identity pinning) and `useFancyT`
+  (shared translators).
+- `src/context.ts`: the context, created on a global symbol.
+- `src/format.ts`: cached Intl formatters. It is kept apart so a component that
+  doesn't format doesn't ship it.
+- `fixtures/laravel-format.json`: the shared fixture. fancy-translations runs
+  it in Pest. It ships in the tarball.
+
+## Invariants (each has a test that was shown to fail without its mechanism)
+
+- **The Laravel format is Laravel's.** Change a fixture value only after
+  checking it against Laravel's own `Translator::makeReplacements` and
+  `MessageSelector`. Never change one to match this code. A plural rule change
+  must still agree with Laravel for all 280 of its locale labels.
+- **English text takes English plural rules.** When `t.choice` falls back to
+  the English default, it selects with `en`, never the page locale.
+- **The order is labels, host, packs, English.** An empty string counts as
+  missing. It never returns a raw key, and an inherited Object property is
+  never a translation.
+- **Identity.** The provider value changes only when locale, pinned strings,
+  packs (compared by content), plural rules, or `formatLocale` change. A new
+  `onMissingKey` never rebuilds it. `useFancyT` has exactly one hook,
+  `useContext`. Adding a hook or a memo there is a measured cost.
+- **No building on the plain path.** `t(key)` with no values allocates nothing
+  and compiles nothing. A template is split once. An Intl formatter is built
+  once for each pair of locale and options.
+- **Dev warnings are guarded inline** by
+  `typeof process != "undefined" && process.env.NODE_ENV !== "production"`, so
+  a production bundle drops them, message and all. Don't move that guard into
+  a helper: esbuild doesn't inline a function, and the size test checks that
+  `[fancy-i18n]` is gone from the build.
+- **No DOM, no fetch, no `dir`.** The only `dir` is the `ltr` isolate around
+  numbers in `t.nodes`.
+- **Zero runtime dependencies.**
+
+## Tests
+
+`npm test`. The budget tests print their numbers to stderr:
+`budget-deterministic` (compile, construct and cache counts),
+`provider.test.tsx` (re-render counts), `budget-timed` (the SSR ratio, paired
+per round), and `budget-size` (three bundles, with ceilings). The owner's
+1,536 B core figure is a skipped test that names it, because 0.1 does not meet
+it. Read results from a redirected log and its exit code, never through a pipe.

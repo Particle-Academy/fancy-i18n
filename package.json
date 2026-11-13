@@ -1,0 +1,87 @@
+{
+  "name": "@particle-academy/fancy-i18n",
+  "version": "0.1.0",
+  "description": "The runtime label layer for the Fancy UI kit: English defaults next to every component, host strings and locale packs on top, Laravel's message format (:name, pipe plurals, <tag> pairs) on both sides, a ported plural table, cached Intl formatters. Zero dependencies, React as a peer, no measurable cost without a provider.",
+  "keywords": [
+    "i18n",
+    "l10n",
+    "translation",
+    "laravel",
+    "trans_choice",
+    "pluralization",
+    "intl",
+    "react",
+    "inertia",
+    "fancy",
+    "particle-academy"
+  ],
+  "homepage": "https://github.com/Particle-Academy/fancy-i18n#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Particle-Academy/fancy-i18n.git"
+  },
+  "bugs": "https://github.com/Particle-Academy/fancy-i18n/issues",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./fixtures/laravel-format.json": "./fixtures/laravel-format.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "fixtures",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit && eslint .",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "tsup"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "eslint": "^10.8.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "jsdom": "^30.1.3",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.0",
+    "typescript-eslint": "^8.65.0",
+    "vitest": "^4.1.12"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "overrides": {
+    "esbuild": "^0.28.1",
+    "source-map-js": "^1.2.2"
+  }
+}
