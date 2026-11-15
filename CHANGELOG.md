@@ -10,10 +10,10 @@ promising otherwise until 1.0.
 
 ## [Unreleased]
 
-## [0.1.0] - 2026-11-13
+## [0.1.0] - 2026-11-15
 
-First release: phase 1 of the kit i18n plan (owner-approved 2026-11-07). Not
-tagged yet. No kit component reads it yet; react-fancy adopts it in phase 2.
+First release: phase 1 of the kit i18n plan (owner-approved 2026-11-07). No
+kit component reads it yet; react-fancy adopts it in phase 2.
 
 ### Added
 
