@@ -1,6 +1,6 @@
 # @particle-academy/fancy-i18n
 
-The runtime label layer for the Fancy UI kit. Every kit component keeps its
+The runtime label layer for the Fancy Dev Kit. Every kit component keeps its
 English defaults in a frozen object next to it. A host can put its own strings
 and locale packs on top, in **Laravel's message format**, so the same
 `lang/{locale}.json` works in `__()` on the server and in the kit on the client.

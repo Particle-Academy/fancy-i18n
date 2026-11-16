@@ -1,6 +1,6 @@
 # AGENTS.md: fancy-i18n
 
-The runtime label layer for the Fancy UI kit. `CLAUDE.md` is a symlink to this
+The runtime label layer for the Fancy Dev Kit. `CLAUDE.md` is a symlink to this
 file. Process rules (publishing, versions, third-party code) live in the
 envelope's `RULES.md` and are not repeated here. The design is the envelope's
 `.ai/plans/kit-i18n.md`.

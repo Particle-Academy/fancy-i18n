@@ -1,7 +1,7 @@
 {
   "name": "@particle-academy/fancy-i18n",
   "version": "0.1.0",
-  "description": "The runtime label layer for the Fancy UI kit: English defaults next to every component, host strings and locale packs on top, Laravel's message format (:name, pipe plurals, <tag> pairs) on both sides, a ported plural table, cached Intl formatters. Zero dependencies, React as a peer, no measurable cost without a provider.",
+  "description": "The runtime label layer for the Fancy Dev Kit: English defaults next to every component, host strings and locale packs on top, Laravel's message format (:name, pipe plurals, <tag> pairs) on both sides, a ported plural table, cached Intl formatters. Zero dependencies, React as a peer, no measurable cost without a provider.",
   "keywords": [
     "i18n",
     "l10n",
