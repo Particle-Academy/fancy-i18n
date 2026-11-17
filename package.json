@@ -45,7 +45,8 @@
     "fixtures",
     "README.md",
     "CHANGELOG.md",
-    "LICENSE"
+    "LICENSE",
+    "AGENTS.md"
   ],
   "sideEffects": false,
   "scripts": {
